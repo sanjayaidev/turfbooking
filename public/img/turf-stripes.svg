@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+<defs><linearGradient id="g" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#2f9a5d"/><stop offset="1" stop-color="#1b7a45"/></linearGradient>
+<radialGradient id="v" cx=".5" cy=".5" r=".75"><stop offset=".55" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#001a0d" stop-opacity=".55"/></radialGradient></defs>
+<rect width="1600" height="900" fill="url(#g)"/>
+<g fill="#38a966" opacity=".55"><rect x="0" y="0" width="1600" height="75"/><rect x="0" y="150" width="1600" height="75"/><rect x="0" y="300" width="1600" height="75"/><rect x="0" y="450" width="1600" height="75"/><rect x="0" y="600" width="1600" height="75"/><rect x="0" y="750" width="1600" height="75"/></g>
+<ellipse cx="800" cy="450" rx="720" ry="400" fill="none" stroke="#fff" stroke-opacity=".75" stroke-width="6" stroke-dasharray="4 14"/>
+<ellipse cx="800" cy="450" rx="360" ry="200" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="4"/>
+<rect x="690" y="150" width="220" height="600" rx="6" fill="#d9c493"/>
+<rect x="690" y="150" width="220" height="600" rx="6" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="3"/>
+<g stroke="#fff" stroke-width="5" opacity=".95"><line x1="690" y1="215" x2="910" y2="215"/><line x1="690" y1="685" x2="910" y2="685"/><line x1="715" y1="190" x2="885" y2="190"/><line x1="715" y1="710" x2="885" y2="710"/></g>
+<g fill="#fff"><rect x="780" y="168" width="6" height="30"/><rect x="797" y="168" width="6" height="30"/><rect x="814" y="168" width="6" height="30"/><rect x="780" y="702" width="6" height="30"/><rect x="797" y="702" width="6" height="30"/><rect x="814" y="702" width="6" height="30"/></g>
+<rect width="1600" height="900" fill="url(#v)"/></svg>
