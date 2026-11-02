@@ -75,6 +75,29 @@ export async function updateTurf(fd: FormData) {
   revalidatePath('/', 'layout');
   back(path, 'Turf details saved.');
 }
+/**
+ * Permanently deletes a turf (and its hours, pricing rules, blocks and turf-only coupons).
+ * Refused while ANY booking exists for it, so booking and payment history is never destroyed;
+ * hide the turf instead in that case. The database foreign key is the final guard.
+ */
+export async function deleteTurf(fd: FormData) {
+  const u = await requirePerm('turfs.manage');
+  const id = str(fd, 'id'); const path = `/admin/turfs/${id}?tab=details`;
+  const t = await q1<any>('SELECT id,name FROM turfs WHERE id=$1', [id]);
+  if (!t) back('/admin/turfs', 'That turf no longer exists.', true);
+  if (str(fd, 'confirm').toLowerCase() !== String(t.name).toLowerCase()) back(path, 'To delete, type the turf name exactly as shown.', true);
+  const used = await q1<any>('SELECT count(*)::int AS n FROM bookings WHERE turf_id=$1', [id]);
+  if (used && used.n > 0) back(path, `This turf has ${used.n} booking(s), so it cannot be deleted. Set its status to "Hidden from customers" instead.`, true);
+  try {
+    await q('DELETE FROM turfs WHERE id=$1', [id]);
+  } catch (e: any) {
+    if (e?.code === '23503') back(path, 'A booking was just made for this turf, so it was not deleted.', true);
+    throw e;
+  }
+  await audit(u, 'turf.delete', 'turf', id, { name: t.name });
+  revalidatePath('/', 'layout');
+  back('/admin/turfs', `Turf "${t.name}" deleted.`);
+}
 export async function updateHours(fd: FormData) {
   const u = await requirePerm('turfs.manage');
   const id = str(fd, 'id'); const path = `/admin/turfs/${id}?tab=hours`;

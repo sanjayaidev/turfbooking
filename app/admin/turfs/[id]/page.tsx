@@ -7,7 +7,7 @@ import { DOW, DOW_SHORT, fmtDate, fmtDateTime, fmtMin, inr } from '@/lib/time';
 import { Badge, cn } from '@/components/ui';
 import { TimeSelect } from '@/components/Time';
 import TurfImage from '@/components/TurfImage';
-import { addBlock, addRule, deleteBlock, deleteRule, toggleRule, updateHours, updatePricing, updateTurf } from '../../actions';
+import { addBlock, addRule, deleteBlock, deleteRule, deleteTurf, toggleRule, updateHours, updatePricing, updateTurf } from '../../actions';
 
 export const metadata = { title: 'Edit turf' };
 const DURS = [15, 30, 45, 60, 90, 120, 150, 180, 240, 300];
@@ -20,11 +20,13 @@ export default async function EditTurf({ params, searchParams }: { params: { id:
   const tabs = [['details', 'Details', 'turfs.manage'], ['hours', 'Operating hours', 'turfs.manage'], ['pricing', 'Pricing', 'pricing.manage'], ['blocks', 'Blocks & maintenance', 'blocks']].filter(([, , p]) => can(user, p));
   if (!tabs.length) return null;
   const tab = tabs.find(([k]) => k === searchParams.tab)?.[0] || tabs[0][0];
-  const [hours, rules, blocks] = await Promise.all([
+  const [hours, rules, blocks, bookingCount] = await Promise.all([
     q<any>('SELECT * FROM operating_hours WHERE turf_id=$1 ORDER BY dow', [t.id]),
     q<any>('SELECT * FROM pricing_rules WHERE turf_id=$1 ORDER BY kind, created_at', [t.id]),
     q<any>('SELECT * FROM blocks WHERE turf_id=$1 AND end_ts > now() - interval \'1 day\' ORDER BY start_ts', [t.id]),
+    q1<any>('SELECT count(*)::int AS n FROM bookings WHERE turf_id=$1', [t.id]),
   ]);
+  const nBookings: number = bookingCount?.n ?? 0;
   return (
     <>
       <Link href="/admin/turfs" className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 hover:text-brand-700"><ArrowLeft className="h-4 w-4" />All turfs</Link>
@@ -34,6 +36,7 @@ export default async function EditTurf({ params, searchParams }: { params: { id:
       </div>
 
       {tab === 'details' && (
+        <>
         <form action={updateTurf} className="grid gap-6 lg:grid-cols-3">
           <input type="hidden" name="id" value={t.id} />
           <div className="card space-y-4 p-6 lg:col-span-2">
@@ -60,6 +63,20 @@ export default async function EditTurf({ params, searchParams }: { params: { id:
               <button className="btn-primary w-full">Save turf details</button></div>
           </div>
         </form>
+        <div className="card mt-6 max-w-xl border border-red-200 p-6">
+          <h2 className="font-bold text-red-700">Delete this turf</h2>
+          {nBookings > 0 ? (
+            <p className="mt-2 text-sm text-ink-600">This turf has {nBookings} booking{nBookings === 1 ? '' : 's'}, so it cannot be deleted (booking and payment history is kept). To stop customers booking it, set Status to “Hidden from customers” above and save.</p>
+          ) : (
+            <form action={deleteTurf} className="mt-2 space-y-3">
+              <input type="hidden" name="id" value={t.id} />
+              <p className="text-sm text-ink-600">Permanently removes this turf with its operating hours, pricing rules and blocks. This cannot be undone.</p>
+              <div><label className="label">Type <span className="font-semibold text-ink-900">{t.name}</span> to confirm</label><input name="confirm" className="input" autoComplete="off" required /></div>
+              <button className="btn-danger">Delete turf permanently</button>
+            </form>
+          )}
+        </div>
+        </>
       )}
 
       {tab === 'hours' && (
