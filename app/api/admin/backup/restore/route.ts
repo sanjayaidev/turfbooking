@@ -20,7 +20,8 @@ export async function POST(req: NextRequest) {
     const fd = await req.formData();
     const file = fd.get('file');
     const mode = String(fd.get('mode') || 'preview');
-    if (!(file instanceof File) || file.size === 0) return fail('Choose a backup file (.xlsx) first.');
+    // Not `instanceof File`: Node 18 (allowed by "engines") has no global File, so that line throws there.
+    if (!file || typeof file === 'string' || typeof file.arrayBuffer !== 'function' || file.size === 0) return fail('Choose a backup file (.xlsx) first.');
     if (file.size > MAX_BYTES) return fail('That file is larger than 50 MB.');
     const bytes = Buffer.from(await file.arrayBuffer());
     if (bytes.length < 4 || bytes[0] !== 0x50 || bytes[1] !== 0x4b) return fail('That is not an Excel (.xlsx) file.');
