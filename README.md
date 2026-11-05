@@ -39,6 +39,13 @@ npm run dev               # http://localhost:3000
 - **Admin:** dashboard (revenue, bookings, popular slots), bookings (search/filter/export CSV, manual booking, cancel, refunds, check-in), calendar, turfs (details, photos, amenities, durations, hours, base/peak/off-peak/holiday pricing, promo %, blocks/maintenance), coupons, customers, QR check-in (camera or paste), staff & per-staff permissions, settings (business info, cancellation policy, booking rules), email outbox, audit log.
 - **Multi-turf:** every table is keyed by turf; add turfs from Admin → Turfs & Pricing.
 
+## Backup & restore (Admin → Backup & restore, admin only)
+- **Download:** one `.xlsx` workbook with a sheet for every table (plus a `_backup_info` sheet). Text longer than an Excel cell is split over `column~2`, `column~3`… and joined again on restore. The file contains customer details and password hashes, so keep it private.
+- **Restore is delta based.** Upload a workbook and each sheet is compared with the live table by primary key. You get a preview (new rows, changed rows with old → new values, identical rows, rows only in the database) and choose which tables to apply. Missing rows are inserted and changed rows are updated. **Rows that exist only in the database are never deleted.**
+- A row that cannot be restored (for example a booking whose slot has since been taken, or one that points at a missing turf) is skipped and reported; every other row still restores. The apply step is one transaction.
+- Adding a table to `db/schema.sql`? Add it to `BACKUP_TABLES` in `lib/backup.ts` (parents before children). The page warns when a table is not covered.
+- `BASE=http://localhost:3000 DATABASE_URL=... node scripts/backup-e2e.mjs` runs 53 checks for this feature (needs the demo seed).
+
 ## How double-booking is prevented
 `bookings` has a PostgreSQL `EXCLUDE USING gist` constraint on (turf, time range) for active bookings, so even simultaneous requests cannot overlap. Unpaid holds expire after the lock time and are released automatically. Prices and coupons are always calculated on the server.
 

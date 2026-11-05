@@ -22,6 +22,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     { href: '/admin/staff', label: 'Staff & roles', icon: 'staff', perm: 'admin' },
     { href: '/admin/settings', label: 'Settings', icon: 'settings', perm: 'admin' },
     { href: '/admin/audit', label: 'Audit log', icon: 'audit', perm: 'admin' },
+    { href: '/admin/backup', label: 'Backup & restore', icon: 'backup', perm: 'admin' },
   ];
   const items = all.filter((i) => (Array.isArray(i.perm) ? i.perm.some((p) => can(user, p)) : can(user, i.perm))).map(({ perm, ...r }) => r);
   return (

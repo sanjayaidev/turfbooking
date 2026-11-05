@@ -2,10 +2,10 @@
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { LayoutDashboard, CalendarDays, ListChecks, QrCode, Landmark, Ticket, Users, UserCog, Settings, Mail, ScrollText, Menu, X, LogOut, ExternalLink, PlusCircle } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, ListChecks, QrCode, Landmark, Ticket, Users, UserCog, Settings, Mail, ScrollText, DatabaseBackup, Menu, X, LogOut, ExternalLink, PlusCircle } from 'lucide-react';
 import { cn } from './ui';
 
-const ICONS: Record<string, any> = { dashboard: LayoutDashboard, calendar: CalendarDays, bookings: ListChecks, checkin: QrCode, turfs: Landmark, coupons: Ticket, customers: Users, staff: UserCog, settings: Settings, emails: Mail, audit: ScrollText };
+const ICONS: Record<string, any> = { dashboard: LayoutDashboard, calendar: CalendarDays, bookings: ListChecks, checkin: QrCode, turfs: Landmark, coupons: Ticket, customers: Users, staff: UserCog, settings: Settings, emails: Mail, audit: ScrollText, backup: DatabaseBackup };
 
 export type NavItem = { href: string; label: string; icon: string };
 
